@@ -165,18 +165,17 @@ class BackViewModel : BackupClickListener {
     }
 
     private fun writeLink() {
-        XXPermissions.with(mContext)
+        XXPermissions.with(mContext!!)
             .permission(Permission.WRITE_EXTERNAL_STORAGE)
             .permission(Permission.READ_EXTERNAL_STORAGE)
             .request(object: OnPermissionCallback {
-                override fun onGranted(permissions: MutableList<String>?, all: Boolean) {
+                override fun onGranted(permissions: MutableList<String>, all: Boolean) {
                     TermuxInstaller.setupStorageSymlinks(mContext)
                 }
 
-                override fun onDenied(permissions: MutableList<String>?, never: Boolean) {
+                override fun onDenied(permissions: MutableList<String>, never: Boolean) {
                     UUtils.showMsg(UUtils.getString(R.string.没有SD卡权限))
                 }
-
-            });
+            })
     }
 }
