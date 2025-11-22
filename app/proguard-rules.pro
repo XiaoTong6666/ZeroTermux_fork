@@ -19,9 +19,9 @@
 -keep class **$$DGSubListenerProxy{ *; }
 -keep class com.hzy.lib7z.**{*;}
 -keepclasseswithmembernames class * {
-    @Download.* <methods>;
-    @Upload.* <methods>;
-    @DownloadGroup.* <methods>;
+    @com.arialyy.annotations.Download.* <methods>;
+    @com.arialyy.annotations.Upload.* <methods>;
+    @com.arialyy.annotations.DownloadGroup.* <methods>;
 }
 
 # LocalePlugin 混淆规则
@@ -58,3 +58,16 @@
 
 # 保留自定义工具类
 -keep class com.your.package.ContextUtil { *; }
+
+# 忽略 AgentWeb 对支付宝 SDK 的引用
+-dontwarn com.alipay.sdk.**
+-dontwarn com.alipay.api.**
+
+# 忽略 Log4j 对 Java Beans 的引用 (Android 不支持 java.beans)
+-dontwarn java.beans.**
+
+# 忽略 ZXing 引用 (防止 BGAQRCode 报错)
+-dontwarn com.google.zxing.**
+
+# 忽略 OkGo 可能引用的类
+-dontwarn com.lzy.okgo.**

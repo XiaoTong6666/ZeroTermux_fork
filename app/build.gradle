@@ -210,6 +210,8 @@ dependencies {
     implementation 'com.google.android.material:material:1.10.0'
     implementation 'androidx.constraintlayout:constraintlayout:2.1.4'
 
+    implementation 'com.google.zxing:core:3.3.3'
+
     implementation files('libs/commons-logging-1.2.jar')
     implementation files('libs/commons-net-3.8.0.jar')
     implementation files('libs/ftplet-api-1.1.1.jar')
