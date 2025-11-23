@@ -1578,7 +1578,9 @@ public final class TermuxActivity extends AppCompatActivity implements ServiceCo
                     return;
                 }
 
-                switch (Objects.requireNonNull(intent.getAction())) {
+                String action = intent.getAction();
+                if (action == null) return;
+                switch (action) {
                     case TERMUX_ACTIVITY.ACTION_NOTIFY_APP_CRASH:
                         Logger.logDebug(LOG_TAG, "Received intent to notify app crash");
                         TermuxCrashUtils.notifyAppCrashFromCrashLogFile(context, LOG_TAG);
