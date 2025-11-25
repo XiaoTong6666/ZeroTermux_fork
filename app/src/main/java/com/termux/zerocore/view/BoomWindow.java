@@ -314,9 +314,9 @@ public class BoomWindow {
                 if (!android.text.TextUtils.isEmpty(bean.getPassword())) {
                     UUtils.showMsg("正在连接: " + bean.getAlias());
                 }
-                String runCmd = "clear && " + finalCmd;
+                String runCmd = " clear && " + finalCmd;
 
-                //屏蔽Connection refused用String runCmd = "clear && " + finalCmd + " 2>/dev/null || echo 'err'";
+                //屏蔽Connection refused用String runCmd = " clear && " + finalCmd + " 2>/dev/null || echo 'err'";
 
                 TermuxActivity.mTerminalView.sendTextToTerminal(runCmd + "\n");
 
