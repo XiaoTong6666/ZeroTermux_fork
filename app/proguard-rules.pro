@@ -8,112 +8,117 @@
 #   http://developer.android.com/guide/developing/tools/proguard.html
 
 -dontobfuscate
-#-renamesourcefileattribute SourceFile
-#-keepattributes SourceFile,LineNumberTable
+-optimizations !code/simplification/arithmetic,!field/*,!class/merging/*
 
+# 保留所有 Native 方法
+-keepclasseswithmembernames,allowobfuscation class * {
+    native <methods>;
+}
+
+# 保留自定义异常，防止日志看不懂
+-keep public class * extends java.lang.Exception
+
+# 忽略 IDE 对隐藏 API 的警告
+-dontwarn android.app.ActivityThread
+-dontwarn android.app.ContextImpl
+-dontwarn android.os.ServiceManager
+-dontwarn android.view.**
+
+# 保护反射调用
+-keep class android.app.ActivityThread { *; }
+-keepclassmembers class android.app.ActivityThread {
+    public static *** currentActivityThread();
+    public *** getSystemContext();
+    public *** getApplication();
+    public static *** currentApplication();
+}
+-keep class android.app.ContextImpl { *; }
+-keep class android.os.Looper { *; }
+-keep class android.os.Handler { *; }
+-keep class android.os.ServiceManager {
+    public static android.os.IBinder getService(java.lang.String);
+}
+# 保护 IWindowSession 等底层图形接口
+-keep class android.view.** { *; }
+
+# 安装器、服务、Activity
+-keep class com.termux.app.TermuxInstaller { *; }
+-keep class com.termux.app.TermuxService { *; }
+-keep class com.termux.app.TermuxActivity { *; }
+
+# Bootstrap 引导 (注意：根据你的反馈，它在 shared 模块)
+-keep class com.termux.shared.termux.TermuxBootstrap { *; }
+
+# Termux Shared 工具库 (文件操作、ViewUtils 等)
+-keep class com.termux.shared.** { *; }
+
+# BuildConfig 版本信息 (适配 AGP 8 namespace)
+-keep class com.termux.BuildConfig { *; }
+-keep class com.termux.shared.BuildConfig { *; }
+
+# 彻底保护 ZeroCore 引擎，防止反射 newInstance 崩溃
+-keep class com.termux.zerocore.** { *; }
+-dontwarn com.termux.zerocore.**
+
+# 显式保留构造函数
+-keepclassmembers class com.termux.zerocore.zero.engine.ZeroCoreManage {
+    <init>(...);
+}
+
+# 保护依赖工具库 xh_lib
+-keep class com.example.xh_lib.** { *; }
+
+# 保护实体类 (Gson 序列化)
+-keep class com.termux.zerocore.bean.** { *; }
+-keepattributes Signature,*Annotation*,EnclosingMethod
+
+# Apache Commons Compress (Symlinks 处理)
+-keep class org.apache.commons.compress.** { *; }
+-keep interface org.apache.commons.compress.** { *; }
+-dontwarn org.apache.commons.compress.**
+
+# Aria 下载库
 -dontwarn com.arialyy.aria.**
 -keep class com.arialyy.aria.**{*;}
 -keep class **$$DownloadListenerProxy{ *; }
 -keep class **$$UploadListenerProxy{ *; }
 -keep class **$$DownloadGroupListenerProxy{ *; }
 -keep class **$$DGSubListenerProxy{ *; }
--keep class com.hzy.lib7z.**{*;}
 -keepclasseswithmembernames class * {
     @com.arialyy.annotations.Download.* <methods>;
     @com.arialyy.annotations.Upload.* <methods>;
     @com.arialyy.annotations.DownloadGroup.* <methods>;
 }
 
-# LocalePlugin 混淆规则
--keep class com.mallotec.reb.localeplugin.** { *; }
--dontwarn com.mallotec.reb.localeplugin.**
-
--keep class com.termux.zerocore.ftp.new_ftp.** { *; }
--dontwarn com.termux.zerocore.ftp.new_ftp.**
-
--keep class org.apache.mina.** { *; }
--dontwarn org.apache.mina.**
-
--keep class org.apache.ftpserver.** { *; }
--dontwarn org.apache.ftpserver.**
-
-# 保留 CmdEntryPoint 及其依赖
--keep class com.termux.x11.CmdEntryPoint { *; }
--keep class com.termux.x11.Loader { *; }
-
-# 保留所有native方法
--keepclasseswithmembernames class * {
-    native <methods>;
-}
-
-# 保留自定义异常类
--keep public class * extends java.lang.Exception
-
-# 保留ActivityThread相关反射类
--keep class android.app.ActivityThread { *; }
--keepclassmembers class android.app.ActivityThread {
-    public static *** currentActivityThread();
-    public *** getSystemContext();
-}
-
-# 保留自定义工具类
--keep class com.your.package.ContextUtil { *; }
-
-# 忽略 AgentWeb 对支付宝 SDK 的引用
--dontwarn com.alipay.sdk.**
--dontwarn com.alipay.api.**
-
-# 忽略 Log4j 对 Java Beans 的引用 (Android 不支持 java.beans)
--dontwarn java.beans.**
-
-# 忽略 ZXing 引用 (防止 BGAQRCode 报错)
--dontwarn com.google.zxing.**
-
-# 忽略 OkGo 可能引用的类
--dontwarn com.lzy.okgo.**
-
-# 保护实体类不被混淆，否则 Gson 无法将 JSON 映射回对象
--keep class com.termux.zerocore.bean.** { *; }
-
-# 保护泛型信息和注解（Gson 依赖这些）
--keepattributes Signature
--keepattributes *Annotation*
--keepattributes EnclosingMethod
-
-# Termux-X11 使用 app_process 启动，非常依赖类名和反射，必须完全保留
+# Termux X11
 -keep class com.termux.x11.** { *; }
 -dontwarn com.termux.x11.**
 
-# 保护 Android 系统隐藏 API (ActivityThread)
-# CmdEntryPoint 需要通过反射调用这些类来获取 Context
--keep class android.app.ActivityThread {
-    public static android.app.ActivityThread currentActivityThread();
-    public android.app.ContextImpl getSystemContext();
-    public android.app.Application getApplication();
-    public static android.app.Application currentApplication();
-}
+# 其他杂项库
+-keep class com.mallotec.reb.localeplugin.** { *; }
+-dontwarn com.mallotec.reb.localeplugin.**
+-keep class org.apache.mina.** { *; }
+-dontwarn org.apache.mina.**
+-keep class org.apache.ftpserver.** { *; }
+-dontwarn org.apache.ftpserver.**
+-keep class com.hzy.lib7z.**{*;}
+-keep class com.your.package.ContextUtil { *; }
 
-# 保护 ContextImpl (Context 的具体实现)
--keep class android.app.ContextImpl {
-    *;
-}
+# 忽略无害警告 (减少构建噪音)
+-dontwarn com.alipay.sdk.**
+-dontwarn com.alipay.api.**
+-dontwarn java.beans.**
+-dontwarn com.google.zxing.**
+-dontwarn com.lzy.okgo.**
+-dontwarn cn.bingoogolapple.photopicker.**
+-dontwarn com.draggable.library.extension.**
 
-# 保护 Looper 和 Handler (堆栈中涉及到了消息循环)
--keep class android.os.Looper {
-    public static void loop();
-    public static android.os.Looper myLooper();
-    public static void prepare();
-}
+-keepattributes Signature
+-keepattributes *Annotation*
 
--keep class android.os.Handler {
-    *;
-}
+# 保护数据模型
+-keep class com.termux.zerocore.bean.** { *; }
 
-# 保护 ServiceManager (有些版本可能需要)
--keep class android.os.ServiceManager {
-    public static android.os.IBinder getService(java.lang.String);
-}
-
-# 保护 IWindowSession 等底层图形接口 (解决 gralloc-mapper warning 隐患)
--keep class android.view.** { *; }
--dontwarn android.view.**
+# 关键：保护 TypeToken 的匿名子类，防止 R8 移除泛型信息导致运行时崩溃
+-keep class com.google.gson.reflect.TypeToken { *; }
+-keep class * extends com.google.gson.reflect.TypeToken
